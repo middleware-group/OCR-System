@@ -1,24 +1,13 @@
 <template>
 <div id="index">
-  <div class="navigator">
-    <div class="left-menu">
-      <div class="system-icon">
-        <img class="icon" src="../assets/系统.png" />
-      </div>
-    </div>
-    <div class="right-menu">
-      <div class="menu-title" @click="dialogVisible=true">
-        <span>登录</span>
-      </div>
-    </div>
-  </div>
+  <top-menu></top-menu>
   <div class="blank-space"></div>
   <div class="main-content">
     <div class="introduction">
       <span>Welcome!</span><br/>
-      <span>欢迎使用 Beiker-UI</span><br/>
-      <span>体验更智能的组件</span><br/>
-      <router-link to="/test">
+      <span>欢迎使用 OCR 识别工具</span><br/>
+      <span>体验更智能的服务</span><br/>
+      <router-link to="/upload">
         <button class="login-button" @mouseover="hoverShake_copy($event,8,60)" @mouseleave="shakeStatus = false">立即进入</button>
       </router-link>
     </div>
@@ -28,8 +17,8 @@
 
 <script>
     export default {
-        components:{
-
+        components: {
+            'top-menu': () => import('../components/top-menu')
         },
         name: "index",
         data() {
@@ -49,10 +38,10 @@
             }
             (async function(){
                 let animatedDiv = document.getElementsByClassName('introduction')[0];
-                await addStyle(animatedDiv,'margin-right','200px',0);
+                await addStyle(animatedDiv,'margin-left','200px',0);
                 await addStyle(animatedDiv,'transition','all 0.15s ease-out',700);
-                await addStyle(animatedDiv,'margin-right','120px',0);
-                await addStyle(animatedDiv,'margin-right','180px',120);
+                await addStyle(animatedDiv,'margin-left','140px',0);
+                await addStyle(animatedDiv,'margin-left','180px',120);
             }());
 
         },
@@ -140,7 +129,8 @@
       height: 50px;
       cursor: pointer;
       /*background-color: dodgerblue;*/
-      background-color: #dd5347;
+      /*background-color: #dd5347;*/
+      background-color: #409EFF;
       font-size: 18px;
       outline: none;
       border: none;
@@ -170,8 +160,9 @@
         top:0;
         float: right;
         width: 150px;
-        background-color: #dd5347;
+        /*background-color: #dd5347;*/
         /*background-color: dodgerblue;*/
+        background-color: #409EFF;
         height: 51px;
         right: 0;
         line-height: 50px;
@@ -207,7 +198,7 @@
       left: 0;
       margin: 0;
       padding: 0;
-      background: url("../assets/background.jpg")0 0 no-repeat ;
+      background: url("../assets/5.jpg")0 0 no-repeat ;
       background-size: cover;
       width: 100%;
       height: 100vh;
@@ -215,8 +206,8 @@
       .introduction{
         color: white;
         margin-top: 200px;
-        float: right;
-        margin-right: -500px;
+        float: left;
+        margin-left: -500px;
         font-size: 50px;
         font-weight: lighter;
         font-family: "Roboto","Helvetica",arial,sans-serif;
