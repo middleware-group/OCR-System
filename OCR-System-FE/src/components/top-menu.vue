@@ -53,7 +53,7 @@
         border-bottom: 1px solid whitesmoke;
         position: fixed;
         background-color: white;
-        z-index: 1000;
+        z-index: 10;
 
     .right-menu{
         position: fixed;
