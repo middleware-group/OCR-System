@@ -4,10 +4,10 @@
   <div class="blank-space"></div>
   <div class="main-content">
     <div class="introduction">
-      <span>Welcome!</span><br/>
-      <span>欢迎使用 OCR 识别工具</span><br/>
+      <span>Welcome !</span><br/>
+      <span>OCR - 图像中文字的识别和提取</span><br/>
       <span>体验更智能的服务</span><br/>
-      <router-link to="/upload">
+      <router-link to="/ocr">
         <button class="login-button" @mouseover="hoverShake_copy($event,8,60)" @mouseleave="shakeStatus = false">立即进入</button>
       </router-link>
     </div>
@@ -205,7 +205,7 @@
 
       .introduction{
         color: white;
-        margin-top: 200px;
+        margin-top: 250px;
         float: left;
         margin-left: -500px;
         font-size: 50px;
