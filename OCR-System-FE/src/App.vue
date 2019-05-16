@@ -11,5 +11,8 @@ export default {
 </script>
 
 <style>
-
+#app{
+  font-weight: lighter;
+  font-family: "Roboto","Helvetica",arial,sans-serif;
+}
 </style>

@@ -4,25 +4,16 @@
     <div class="main">
       <div class="member-container">
         <div class="member-card">
-          <!--<el-row :gutter="100" class="organization">-->
-            <!--<el-col :span="8" v-for="o in organization" :key="o.name">-->
-              <!--<el-card shadow="always" v-bind:class="o.visible">-->
-                <!--<p class="member-text">组织名称：middleware-group</p>-->
-                <!--<p class="member-text">GitHub：</p>-->
-                <!--<p class="member-text">邮箱：{{o.email}}</p>-->
-              <!--</el-card>-->
-            <!--</el-col>-->
-          <!--</el-row>-->
-          <el-row :gutter="100">
-            <el-col :span="8" v-for="member in members" :key="member.name">
-              <el-card shadow="always">
-                <p class="member-text">姓名：{{member.name}}</p>
-                <p class="member-text">性别：{{member.sex}}</p>
-                <p class="member-text">GitHub：{{member.github}}</p>
-                <p class="member-text">邮箱：{{member.email}}</p>
-              </el-card>
-            </el-col>
-          </el-row>
+          <div v-for="member in members" :key="member.name" class="card">
+            <el-card shadow="always">
+              <p class="member-text">
+                <span>姓名：{{member.name}}</span>
+                <span style="margin-left: 45px">性别：{{member.sex}}</span>
+              </p>
+              <p class="member-text">学号：{{member.email}}</p>
+              <p class="member-text">主要负责：{{member.job}}</p>
+            </el-card>
+          </div>
         </div>
       </div>
 
@@ -35,27 +26,46 @@
     export default {
         name: "contact",
         components: {TopMenu},
+        mounted(){
+            function addStyle(element,key,value,time){
+                return new Promise(resolve => {
+                    setTimeout(()=>{
+                        element.style[key] = value;
+                        resolve();
+                    },time);
+                })
+            }
+            (async function(){
+                let memberCard = document.getElementsByClassName('card');
+                let time = 0;
+                for(let card of memberCard){
+                    await addStyle(card,'opacity','0.9',time);
+                    time += 300;
+                }
+            }());
+
+        },
         data(){
             return{
                 members:[
                     {
                         name:"谭源杰",
                         sex:"男",
-                        email:"413145873@qq.com",
-                        github:"TanYJie"
+                        email:"24320162202906",
+                        job:"网站系统搭建，前端架构及编码，后台架构及编码"
                     },
                     {
                         name:"梁佳音",
                         sex:"女",
-                        email:"2807513230@qq.com",
-                        github:"greengreenlemon"
+                        email:"24320162202863",
+                        job:""
                     },
                     {
                         name:"杨雨涵",
                         sex:"男",
-                        email:"631971262@qq.com",
-                        github:"YYhyang"
-                    },
+                        email:"24320162202961",
+                        job:""
+                    }
                 ],
                 organization:[
                     {
@@ -83,7 +93,7 @@
   left: 0;
   margin: 0;
   padding: 0;
-  background: url("../assets/5.jpg")0 0 no-repeat ;
+  background: url("../assets/4.jpg")0 0 no-repeat ;
   background-size: cover;
   width: 100%;
   height: 100vh;
@@ -91,17 +101,15 @@
 }
 .member-container{
   width: 90%;
-  margin: 200px auto 0 auto;
-  font-weight: lighter;
-  font-family: "Roboto","Helvetica",arial,sans-serif;
+  margin: 130px auto 0 auto;
 }
 .member-card{
-  text-align: left;
-  opacity: 0.9;
+  text-align: center;
 }
 .member-text{
   margin-left: 35px;
   width: fit-content;
+  text-align: left;
 }
 .organization{
   margin-bottom: 50px;
@@ -111,5 +119,13 @@
 }
 .hidden{
   visibility: hidden;
+}
+.card{
+  display: inline-block;
+  width: 450px;
+  padding: 0 50px 0 0;
+  margin: 0 50px 50px 0;
+  opacity: 0.1;
+  transition: opacity 2.5s;
 }
 </style>

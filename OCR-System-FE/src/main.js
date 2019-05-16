@@ -6,6 +6,12 @@ import router from './router'
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import axios from 'axios'
+
+axios.defaults.baseURL='http://localhost:8081/';
+axios.defaults.withCredentials = true; //发送请求带cookie
+
+Vue.prototype.$axios = axios;
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false

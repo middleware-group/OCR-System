@@ -3,7 +3,9 @@
     <div class="navigator">
       <div class="left-menu">
         <div class="system-icon">
-          <img class="icon" src="../assets/OCR.png" />
+          <router-link to="/">
+            <img class="icon" src="../assets/OCR.png" />
+          </router-link>
         </div>
       </div>
       <div class="right-menu" v-if="!exitAble" @click="contact" style="cursor: pointer">
