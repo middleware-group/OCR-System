@@ -8,6 +8,18 @@
           </router-link>
         </div>
       </div>
+      <div class="middle-menu" @click="handleClick">
+        <router-link to="/ocr">
+          <div class="middle-navigator">
+            图像识别
+          </div>
+        </router-link>
+        <router-link to="/translate">
+          <div class="middle-navigator">
+            语言翻译
+          </div>
+        </router-link>
+      </div>
       <div class="right-menu" v-if="!exitAble" @click="contact" style="cursor: pointer">
         <div class="menu-title">
           <span>联系作者</span>
@@ -29,6 +41,19 @@
             exitAble: {
                 type: Boolean,
                 default: false
+            },
+            active: {
+                type: Number,
+                default: -1
+            },
+            submenuList: {
+                type: Array
+            }
+        },
+        mounted(){
+            let index = this.$props.active;
+            if(index >= 0){
+                document.getElementsByClassName('middle-navigator')[index].classList.add('middle-navigator-active')
             }
         },
         methods:{
@@ -37,6 +62,10 @@
             },
             goBack:function () {
                 this.$router.back();
+            },
+            handleClick(event){
+                let ele = event.target || event.srcElement;
+                ele.classList.add('middle-navigator-active');
             }
         }
     }
@@ -69,7 +98,7 @@
         background-color: #409EFF;
         height: 51px;
         right: 0;
-        line-height: 50px;
+        line-height: 51px;
 
         .menu-title{
           text-align: center;
@@ -84,6 +113,7 @@
         .left-menu{
             width: 60px;
             margin-left: 20px;
+            display: inline-block;
 
             .icon{
               width: 30px;
@@ -92,5 +122,36 @@
             }
         }
     }
+
+  .middle-menu{
+    position: absolute;
+    height: 49px;
+    display: inline-block;
+    margin-left: 30px;
+  }
+
+  .middle-navigator{
+    cursor: pointer;
+    display: inline-block;
+    height: 49px;
+    width: 100px;
+    text-align: center;
+    margin-right: 20px;
+    font-size: 18px;
+    line-height: 49px;
+  }
+
+    .middle-navigator:hover:after,.middle-navigator-active:after{
+      content: "";
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: dodgerblue;
+    }
+    .middle-navigator-active,.middle-navigator:hover{
+      color: dodgerblue;
+    }
+
+
 
 </style>

@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import index from '../pages/index'
-import first from '../pages/first'
 import test from '../pages/test'
 
 Vue.use(Router);
@@ -32,6 +31,11 @@ export default new Router({
             path: '/ocr',
             name: 'ocr',
             component: () => import('../pages/ocr')
+        },
+        {
+            path: '/translate',
+            name: 'translate',
+            component: () => import('../pages/translate')
         },
         {
             path: '/test',

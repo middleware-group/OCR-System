@@ -1,7 +1,6 @@
 <template>
-  <div class="ocr">
-    <!--<div id="mask"></div>-->
-    <top-menu :active='active'></top-menu>
+  <div class="translate">
+    <top-menu active='1'></top-menu>
     <el-container class="main-container">
       <el-main class="main-container-el">
         <div class="breadcrumb">
@@ -26,27 +25,29 @@
           <div class="play" v-show="!isPlay">
             <el-upload
                     class="upload-demo"
-                    :limit="fileNum"
                     drag
-                    :action="uploadAction"
-                    :on-error="uploadError"
-                    :on-success="uploadSucceed"
-                    :before-upload="beforeUpload"
+                    action="https://jsonplaceholder.typicode.com/posts/"
                     multiple>
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
               <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
             </el-upload>
+            <!--<img src="../assets/start.png" @click="play"/>-->
           </div>
           <div class="result" v-show="isPlay">
             <div class="result-text">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              本次准确率：<span style="color: #67C23A">{{active.value}}</span> <br><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              平均准确率：<span style="color: #67C23A">{{ave}}</span> <br><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               耗时：<span style="color: #67C23A">{{showTime}} ms</span>
             </div>
-            <div>
-
+            <div class="result-image">
+              <img :src="active.file"/>
             </div>
           </div>
+
         </div>
 
       </el-main>
@@ -57,7 +58,6 @@
 <script>
     import TopMenu from "../components/top-menu";
     import SideBar from "../components/side-bar";
-
     export default {
         name: "ocr",
         components: {
@@ -76,16 +76,19 @@
                 let main = document.getElementsByClassName('main-container-el')[0];
                 addStyle(main,'opacity','1.0',0);
             }());
+
         },
         data(){
             return{
-                active: 0,
-                uploadAction: this.$axios.defaults.baseURL + "ocr",
                 isPlay: false,
                 isLoading: false,
                 radio: "1",
-                fileNum: 1,
+                ave: "",
                 res: [],
+                active: {
+
+                },
+                page: 1,
                 time: new Date(),
                 showTime: 0
             }
@@ -96,43 +99,35 @@
                 _this.$data.isPlay = true;
                 _this.$data.isLoading = true;
                 _this.$data.time = new Date();
+                this.exec();
             },
-            beforeUpload: function(){
-                this.$data.isLoading = true;
-                this.$data.time = new Date();
-            },
-            uploadSucceed: function(response){
-                let _this = this;
-                console.log(response);
-                if(response.error_msg){
-                    this.$data.isLoading = false;
-                    if(response.error_msg=="service timeout"){
-                        this.showMsg("Sorry , 服务器正忙 , 请稍后再试","error");
-                    }else if(response.error_msg=="image format error"){
-                        this.showMsg("Sorry , 文件格式错误 , 请上传 JPG/PNG 格式图片","error");
+            exec: function(){
+                let _this=this;
+                this.$axios({
+                    method:'get',
+                    url:'/first',
+                }).then(function (response) {
+                    let d = new Date();
+                    _this.$data.showTime = parseInt((d - _this.$data.time));//两个时间相差的秒数
+                    console.log(_this.$data.showTime);
+                    let data = response.data;
+                    let result = data.result;
+                    let filePath = data.filePath;
+                    _this.$data.ave = data["average"];
+                    _this.$data.active = {
+                        value: result[0],
+                        file: filePath[0]
+                    };
+                    for(let i=0; i<result.length; i++){
+                        _this.$data.res.push({
+                            value: result[i],
+                            file: filePath[i]
+                        })
                     }
-                    return false;
-                }
-                _this.$data.isLoading = false;
-                _this.$data.isPlay = true;
-                let d = new Date();
-                _this.$data.showTime = parseInt((d - _this.$data.time));//两个时间相差的秒数
-            },
-
-            uploadError: function () {
-                this.$data.isLoading = false;
-                this.showMsg("Sorry, 文件上传失败, 请稍后再试","error");
-            },
-
-            showMsg: function (message,type) {
-                if(!message || !type){
-                    return;
-                }
-                this.$message({
-                    message: message,
-                    type: type,
-                    duration: 4000
-                });
+                    _this.$data.isLoading = false;
+                }).catch(function (error) {
+                    console.log(error.response.data)
+                })
             }
         }
 
@@ -194,7 +189,9 @@
   height: 750px;
   text-align: center;
 }
-
+.result-image > img{
+  display: inline-block;
+}
 .result-text{
   margin: 20px 0 30px 0;
   font-size: 18px;

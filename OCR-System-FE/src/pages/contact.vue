@@ -1,6 +1,6 @@
 <template>
   <div class="contact">
-    <top-menu exit-able="false"></top-menu>
+    <top-menu exit-able="false" style="text-align: left"></top-menu>
     <div class="main">
       <div class="member-container">
         <div class="member-card">

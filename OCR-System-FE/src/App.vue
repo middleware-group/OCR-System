@@ -5,8 +5,10 @@
 </template>
 
 <script>
+import TopMenu from "./components/top-menu";
 export default {
-  name: 'App'
+  name: 'App',
+    components: {TopMenu}
 }
 </script>
 

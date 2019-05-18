@@ -18,7 +18,7 @@ public class OCRController {
     private static final String API_KEY="6n1vGtKLFSZBHzFIRb1kt1VT";
     private static final String SECRET_KEY="SogkfUiPefY0Prfrg0zq4nMjadkv5RtL";
     @RequestMapping(value = "/ocr",method = RequestMethod.POST)
-    public Map<String, Object> ocr(@RequestParam("image") MultipartFile file) throws Exception{
+    public Map<String, Object> ocr(@RequestParam("file") MultipartFile file) throws Exception{
         byte[] buf=file.getBytes();
         AipOcr client=new AipOcr(APP_ID,API_KEY,SECRET_KEY);
         HashMap<String,String> options=new HashMap<String,String>();
