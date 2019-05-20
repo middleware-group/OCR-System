@@ -7,6 +7,7 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios'
+import $ from 'jquery'
 
 axios.defaults.baseURL='http://localhost:2020/';
 axios.defaults.withCredentials = true; //发送请求带cookie
@@ -14,7 +15,7 @@ axios.defaults.withCredentials = true; //发送请求带cookie
 Vue.prototype.$axios = axios;
 
 Vue.use(ElementUI);
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
@@ -22,4 +23,4 @@ new Vue({
   router,
   components: { App },
   template: '<App/>'
-})
+});

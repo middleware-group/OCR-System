@@ -1,55 +1,35 @@
 <template>
   <div class="translate">
-    <top-menu active='1'></top-menu>
+    <top-menu :active='topMenuActive'></top-menu>
     <el-container class="main-container">
       <el-main class="main-container-el">
-        <div class="breadcrumb">
-          <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
-            <el-breadcrumb-item></el-breadcrumb-item>
-            <el-breadcrumb-item>目标语言</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-        <div class="question">
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          请选择目标语言：
-          <el-radio v-model="radio" label="1" border style="margin-right: 0">英文</el-radio>
-          <el-radio v-model="radio" label="2" border>中文</el-radio>
-        </div>
-        <div class="breadcrumb">
-          <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
-            <el-breadcrumb-item></el-breadcrumb-item>
-            <el-breadcrumb-item>识别结果</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-        <div class="exec" v-loading="isLoading">
-          <div class="play" v-show="!isPlay">
-            <el-upload
-                    class="upload-demo"
-                    drag
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    multiple>
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-              <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
-            </el-upload>
-            <!--<img src="../assets/start.png" @click="play"/>-->
-          </div>
-          <div class="result" v-show="isPlay">
-            <div class="result-text">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              本次准确率：<span style="color: #67C23A">{{active.value}}</span> <br><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              平均准确率：<span style="color: #67C23A">{{ave}}</span> <br><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              耗时：<span style="color: #67C23A">{{showTime}} ms</span>
-            </div>
-            <div class="result-image">
-              <img :src="active.file"/>
+        <div id="optContainer">
+          <div class="aims">
+            <div class="option-header">
+              <span style="margin-left: 30px">选择语言：</span>
+              <el-radio-group v-model="aimsLanguage">
+                <el-radio-button :label="language.value" :key="language.key" v-for="language in languages"></el-radio-button>
+              </el-radio-group>
+              <div class="textarea-container">
+                <textarea class="result-textarea" v-model="aimsText"></textarea>
+              </div>
             </div>
           </div>
-
+          <div class="middle-img">
+            <img src="../assets/箭头.png"/>
+          </div>
+          <div class="result">
+            <div class="option-header">
+              <span style="margin-left: 30px">选择语言：</span>
+              <el-radio-group v-model="resultLanguage">
+                <el-radio-button :label="language.value" :key="language.key" v-for="language in languages"></el-radio-button>
+              </el-radio-group>
+              <div class="textarea-container" v-loading="resultLoading">
+                <textarea class="result-textarea" disabled v-model="resultText"></textarea>
+              </div>
+            </div>
+          </div>
         </div>
-
       </el-main>
     </el-container>
   </div>
@@ -58,6 +38,7 @@
 <script>
     import TopMenu from "../components/top-menu";
     import SideBar from "../components/side-bar";
+    import {MD5} from "../util/md5"
     export default {
         name: "ocr",
         components: {
@@ -78,56 +59,144 @@
             }());
 
         },
+        watch: {
+            aimsText(value) {
+                let _this = this;
+                clearTimeout(_this.$data.timeId);
+                _this.$data.timeId = setTimeout(()=>{
+                    let aimsLanguage = _this.$data.languageList[_this.$data.aimsLanguage];
+                    let resultLanguage = _this.$data.languageList[_this.$data.resultLanguage];
+                    let appid = '20190519000299262',
+                        key = '45vN5caCtkXTTvHpiWv2',
+                        salt = (new Date).getTime(),
+                        query = value,
+                        from = aimsLanguage,
+                        to = resultLanguage;
+                    let str1 = appid + query + salt +key;
+                    let sign = MD5(str1);
+                    $.ajax({
+                        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+                        type: 'get',
+                        dataType: 'jsonp',
+                        data: {
+                            q: query,
+                            appid: appid,
+                            salt: salt,
+                            from: from,
+                            to: to,
+                            sign: sign
+                        },
+                        success: function (data) {
+                            if(data.error_msg){
+                                _this.$data.resultText = "";
+                                _this.$data.resultLoading = false;
+                                return;
+                            }
+                            let res = "";
+                            data.trans_result.forEach((val)=>{
+                                res = res + val.dst + "\n";
+                            });
+                            _this.$data.resultText = res;
+                        }
+                    });
+                },1000);
+            },
+            aimsLanguage(){
+                this.translate(this.$data.aimsText);
+            },
+            resultLanguage(){
+                this.translate(this.$data.aimsText);
+            }
+        },
         data(){
             return{
-                isPlay: false,
-                isLoading: false,
-                radio: "1",
-                ave: "",
-                res: [],
-                active: {
+                topMenuActive: 1,
+                languages: [{
+                    key: 0,
+                    value: "中文",
+                },{
+                    key: 1,
+                    value: "英语",
+                },{
+                    key: 2,
+                    value: "日语",
+                },{
+                    key: 3,
+                    value: "德语",
+                },{
+                    key: 4,
+                    value: "法语",
+                }],
+                aimsLanguage: "中文",
+                resultLanguage: "中文",
 
+                languageList: {
+                    "中文": "zh",
+                    "英语": "en",
+                    "日语": "jp",
+                    "德语": "de",
+                    "法语": "fra",
                 },
-                page: 1,
-                time: new Date(),
-                showTime: 0
+                aimsText: "",
+                resultText: "",
+                timeId: null,
+                resultLoading: false,
             }
         },
         methods:{
-            play: function(){
+            translate: function (value) {
                 let _this = this;
-                _this.$data.isPlay = true;
-                _this.$data.isLoading = true;
-                _this.$data.time = new Date();
-                this.exec();
-            },
-            exec: function(){
-                let _this=this;
-                this.$axios({
-                    method:'get',
-                    url:'/first',
-                }).then(function (response) {
-                    let d = new Date();
-                    _this.$data.showTime = parseInt((d - _this.$data.time));//两个时间相差的秒数
-                    console.log(_this.$data.showTime);
-                    let data = response.data;
-                    let result = data.result;
-                    let filePath = data.filePath;
-                    _this.$data.ave = data["average"];
-                    _this.$data.active = {
-                        value: result[0],
-                        file: filePath[0]
-                    };
-                    for(let i=0; i<result.length; i++){
-                        _this.$data.res.push({
-                            value: result[i],
-                            file: filePath[i]
-                        })
+                _this.$data.resultLoading = true;
+                let aimsLanguage = _this.$data.languageList[_this.$data.aimsLanguage];
+                let resultLanguage = _this.$data.languageList[_this.$data.resultLanguage];
+                let appid = '20190519000299262',
+                    key = '45vN5caCtkXTTvHpiWv2',
+                    salt = (new Date).getTime(),
+                    query = value,
+                    from = aimsLanguage,
+                    to = resultLanguage;
+                let str1 = appid + query + salt +key;
+                let sign = MD5(str1);
+                $.ajax({
+                    url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+                    type: 'get',
+                    dataType: 'jsonp',
+                    data: {
+                        q: query,
+                        appid: appid,
+                        salt: salt,
+                        from: from,
+                        to: to,
+                        sign: sign
+                    },
+                    success: function (data) {
+                        if(data.error_msg){
+                            _this.$data.resultText = "";
+                            _this.$data.resultLoading = false;
+                            return;
+                        }
+                        let res = "";
+                        data.trans_result.forEach((val)=>{
+                            res = res + val.dst + "\n";
+                        });
+                        _this.$data.resultText = res;
+                        _this.$data.resultLoading = false;
+                    },
+                    error: function () {
+                        _this.showMsg("Sorry , 翻译出错啦","error")
                     }
-                    _this.$data.isLoading = false;
-                }).catch(function (error) {
-                    console.log(error.response.data)
-                })
+                });
+            },
+            //显示消息
+            showMsg: function (message,type) {
+                if(!message || !type){
+                    return;
+                }
+                this.$message({
+                    message: message,
+                    type: type,
+                    duration: 4000
+                });
             }
         }
 
@@ -142,84 +211,67 @@
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background-color: white;
 }
 .main-container-el{
   opacity: 0.1;
   transition: opacity 2s;
 }
-.question{
-  margin-top:20px;
-  margin-left: 50px;
-  font-size: 18px;
-  width: 90%;
-  min-width: 400px;
-  background-color: white;
-  z-index: 100;
+.aims,.result{
   position: relative;
+  height: 500px;
+  display: inline-block;
+  width: 43%;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,.25);
+  border: 1px solid #ebeef5;
+  vertical-align: top;
+  margin-left: 40px;
 }
-.exec{
-  margin-top: 30px;
-  margin-left: 90px;
-  font-size: 18px;
-  width: 85%;
-  min-width: 400px;
-}
-.breadcrumb{
-  margin-top: 30px;
-  margin-left: 30px;
-  width: 400px;
-}
-.play{
+.middle-img{
   position: relative;
-  background: rgba(233, 233, 235, 0.4);
+  display: inline-block;
+  margin-left: 40px;
+  margin-top: 30px;
   height: 500px;
 }
-.play > img{
+.middle-img > img{
   position: absolute;
-  left: 50%;
+  width: 40px;
+  height: 40px;
   top: 50%;
-  width: 200px;
-  margin: -100px 0 0 -100px;
-  display: inline-block;
-  cursor: pointer;
+  transform: translate(-50%,-50%);
 }
-.result{
-  position: relative;
-  height: 750px;
+#optContainer{
+  width: 100%;
+  height: 600px;
+  margin-top: 50px;
+  margin-left: -10px;
   text-align: center;
+  z-index: 1;
+  background-color: white;
 }
-.result-image > img{
-  display: inline-block;
-}
-.result-text{
-  margin: 20px 0 30px 0;
-  font-size: 18px;
+.option-header{
+  margin-top: 30px;
   text-align: left;
 }
-#mask {
-  position: absolute;   /* 使用绝对定位或固定定位  */
-  left: 0;
-  top: 0;
-  width:100%;
-  height:100%;
-  text-align: center;
-  z-index: 99;
-  background-color: rgba(0,0,0,0.4);
-}
-.upload-demo{
+.textarea-container{
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  text-align: center;
-  font-size: 40px;
+  width: 100%;
+  height: calc(90% - 80px);
+  margin: 30px 0 0 30px;
 }
-.el-upload__text{
-  margin-top: 5px;
-  font-size: 16px;
+.result-textarea{
+  position: relative;
+  width: 90%;
+  height: 100%;
+  font-size: 18px;
+  font-weight: lighter;
+  font-family: "Roboto","Helvetica",arial,sans-serif;
+  box-sizing: border-box;
+  /*border: 1.3px solid black;*/
+  border-radius: 6px;
+  padding: 8px 12px;
 }
-.el-upload__tip{
-  font-size: 14px;
+textarea:disabled{
+  background-color: white;
 }
 </style>

@@ -66,8 +66,8 @@
                           @click="resetPicture"
                           size="small">重置</el-button>
                 </div>
-                <div class="textarea-container">
-                  <img :src="uploadImg"/>
+                <div class="image-container">
+                  <img :src="uploadImg" class="result-img"/>
                 </div>
               </el-card>
             </div>
@@ -91,7 +91,7 @@
                           size="small">重置</el-button>
                 </div>
                 <div class="textarea-container">
-                  <textarea class="result-textarea" v-model="resultText">在w3school，你可以找到你所需要的所有的网站建设教程。</textarea>
+                  <textarea class="result-textarea" v-model="resultText"></textarea>
                 </div>
               </el-card>
             </div>
@@ -132,6 +132,8 @@
                 uploadAction: this.$axios.defaults.baseURL + "ocr",
                 uploadActionTx: this.$axios.defaults.baseURL + "ocrtx",
                 uploadImg: "",
+                uploadImgBaidu: "",
+                uploadImgTx: "",
                 isPlay: false,
                 isLoading: false,
                 radio: "1",
@@ -172,7 +174,6 @@
                 }
                 _this.$data.isLoading = false;
                 _this.$data.isPlay = true;
-                _this.$data.uploadImg = response.fileName;
                 let d = new Date();
                 _this.$data.showTime = parseInt((d - _this.$data.time));//两个时间相差的秒数
             },
@@ -188,10 +189,12 @@
                     }
                     return false;
                 }
+                _this.showMsg("识别成功 !","success");
                 let result = "";
                 response.words_result.forEach((val)=>{
                     result = result + val.words + "\n";
                 });
+                _this.$data.uploadImg = response.fileName;
                 _this.$data.resultText = result;
                 _this.$data.resultTextBackup = _this.$data.resultText;
                 return true;
@@ -199,6 +202,20 @@
             uploadTencent: function(response){
                 let _this = this;
                 let result = JSON.parse(response.result);
+                console.log(result);
+                if(result.message==="OK"){
+                    _this.showMsg("识别成功 !","success");
+                }else{
+                    _this.showMsg("Sorry , 识别失败","error");
+                    return;
+                }
+                let resultString = "";
+                result.data.items.forEach((value)=>{
+                    resultString = resultString + value.itemstring + "\n";
+                });
+                _this.$data.uploadImg = response.fileName;
+                _this.$data.resultText = resultString;
+                _this.$data.resultTextBackup = _this.$data.resultText;
                 return true;
             },
 
@@ -279,7 +296,7 @@
 .middle-img > img{
   position: absolute;
   top: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%,-50%);
 }
 .res{
   margin-left: 30px;
@@ -304,18 +321,14 @@
   box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   border: 1px solid #EBEEF5
 }
-.result-img > img{
+.result-img{
+  vertical-align: center;
+  max-height: 100%;
+  width: 100%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  max-height: 500px;
-  height: 500px;
-}
-.result-text{
-  margin: 0 0 30px 0;
-  font-size: 18px;
-  text-align: left;
 }
 .result-textarea,.box-card{
   position: relative;
@@ -329,7 +342,7 @@
   box-sizing: border-box;
   /*border: 1.3px solid black;*/
   border-radius: 6px;
-  padding: 8px;
+  padding: 8px 12px;
 }
 #mask {
   position: absolute;   /* 使用绝对定位或固定定位  */
@@ -358,6 +371,11 @@
 }
 #optContainer{
   height: 600px;
+}
+.image-container{
+  position: absolute;
+  height: calc(95% - 80px);
+  width: calc(95% - 10px);
 }
 .textarea-container{
   position: absolute;
