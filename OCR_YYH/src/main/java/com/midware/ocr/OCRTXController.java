@@ -34,7 +34,7 @@ public class OCRTXController {
         OCRTX ocrtx = new OCRTX();
         Object result = ocrtx.doOcr(newFile);
 
-        String realpath = "http://" + "localhost" + ":" + "2020" + "/image" + "/" + fileName+"."+ subffix;
+        String realpath = "http://localhost:" + "8081" + "/image" + "/" + fileName+"."+ subffix;
 
         HashMap<String,Object> options = new HashMap<String,Object>();
         options.put("result",result);

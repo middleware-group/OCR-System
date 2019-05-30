@@ -18,16 +18,6 @@ export default new Router({
             component: () => import('../pages/contact')
         },
         {
-            path: '/first',
-            name: 'first',
-            component: () => import('../pages/first')
-        },
-        {
-            path: '/second',
-            name: 'second',
-            component: () => import('../pages/second')
-        },
-        {
             path: '/ocr',
             name: 'ocr',
             component: () => import('../pages/ocr')

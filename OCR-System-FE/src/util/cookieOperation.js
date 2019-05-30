@@ -1,5 +1,5 @@
 
-export {addCookie, getCookie, delCookie};
+export default {addCookie, getCookie, delCookie};
 
 //添加cookie
 function addCookie(objName, objValue, objHours) {

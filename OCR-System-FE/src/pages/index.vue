@@ -8,7 +8,9 @@
       <span>OCR - 图像中文字的识别和提取</span><br/>
       <span>体验更智能的服务</span><br/>
       <router-link to="/ocr">
-        <button class="login-button" @mouseover="hoverShake_copy($event,8,60)" @mouseleave="shakeStatus = false">立即进入</button>
+        <button class="login-button"
+                @mouseover="hoverShake_copy($event,8,60)"
+                @mouseleave="shakeStatus = false">立即进入</button>
       </router-link>
     </div>
   </div>
@@ -16,6 +18,7 @@
 </template>
 
 <script>
+    import cookieOpt from "../util/cookieOperation";
     export default {
         components: {
             'top-menu': () => import('../components/top-menu')
@@ -114,8 +117,7 @@
                 }
                 debounceShake();
                 //throttleShake();
-            }
-
+            },
         }
     }
 </script>

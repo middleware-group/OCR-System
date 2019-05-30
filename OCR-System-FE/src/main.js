@@ -9,7 +9,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios'
 import $ from 'jquery'
 
-axios.defaults.baseURL='http://localhost:2020/';
+//axios.defaults.baseURL='http://localhost:2020/';
+axios.defaults.baseURL='http://localhost:8081/';
 axios.defaults.withCredentials = true; //发送请求带cookie
 
 Vue.prototype.$axios = axios;

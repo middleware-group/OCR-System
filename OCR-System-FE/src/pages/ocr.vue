@@ -1,21 +1,29 @@
 <template>
   <div class="ocr">
-    <!--<div id="mask"></div>-->
+    <div id="mask"></div>
     <top-menu :active='active'></top-menu>
     <el-container class="main-container">
       <el-main class="main-container-el">
-        <div class="breadcrumb">
-          <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
-            <el-breadcrumb-item></el-breadcrumb-item>
-            <el-breadcrumb-item>所用 API</el-breadcrumb-item>
-          </el-breadcrumb>
+        <div class="choose">
+          <div class="breadcrumb">
+            <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
+              <el-breadcrumb-item></el-breadcrumb-item>
+              <el-breadcrumb-item>所用 API</el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
+          <div class="question">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            请选择 API：
+            <el-radio v-model="radio" label="1" border style="margin-right: 0" @click="changeAPI(1)">百度 API</el-radio>
+            <el-radio v-model="radio" label="2" border @click="changeAPI(2)">腾讯 API</el-radio>
+          </div>
         </div>
-        <div class="question">
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          请选择 API：
-          <el-radio v-model="radio" label="1" border style="margin-right: 0" @click="changeAPI(1)">百度 API</el-radio>
-          <el-radio v-model="radio" label="2" border @click="changeAPI(2)">腾讯 API</el-radio>
-        </div>
+
+        <tip style="display: inline-block"
+             content="这里可以选择识别所使用的 API"
+             @next="nextStep"
+             v-show="guide==0"></tip>
+
         <div class="breadcrumb">
           <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
             <el-breadcrumb-item></el-breadcrumb-item>
@@ -56,6 +64,11 @@
                 <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
               </el-upload>
             </div>
+            <tip style="position: absolute;top:0;left: 100%"
+                 content="在这里上传需要识别的图片"
+                 v-show="guide==2"
+                 @next="nextStep"></tip>
+
             <div class="result" v-show="isPlay">
               <el-card class="box-card">
                 <div slot="header" style="text-align: left">
@@ -77,6 +90,12 @@
           </div>
 
           <div class="res" v-loading="isLoading">
+            <tip style="position: absolute; top:20%;left: 50%;"
+                 content="这里会显示识别的结果"
+                 button-text="开始识别"
+                 type="primary"
+                 v-show="guide==4"
+                 @next="nextStep"></tip>
             <div class="play" v-show="!isPlay">
 
             </div>
@@ -105,14 +124,26 @@
 
 <script>
     import TopMenu from "../components/top-menu";
-    import SideBar from "../components/side-bar";
+    import tip from "../components/tip";
+    import cookieOpt from "../util/cookieOperation";
 
     export default {
         name: "ocr",
         components: {
             TopMenu,
-            SideBar
-        },mounted(){
+            tip
+        },
+        mounted(){
+            if(!cookieOpt.getCookie("user")){
+                this.$data.guide = 0;
+                let mask = document.getElementById('mask');
+                mask.style.visibility = "visible";
+                cookieOpt.addCookie("user", "anonymous", 1)
+            }
+            if(this.$data.guide==0) {
+                let choose = document.getElementsByClassName('choose')[0];
+                choose.classList.add('highlight');
+            }
             function addStyle(element,key,value,time){
                 return new Promise(resolve => {
                     setTimeout(()=>{
@@ -142,7 +173,8 @@
                 resultText: "",
                 resultBackup: "",
                 time: new Date(),
-                showTime: 0
+                showTime: 0,
+                guide: -1
             }
         },
         methods:{
@@ -245,6 +277,35 @@
                     type: type,
                     duration: 4000
                 });
+            },
+
+            nextStep: function () {
+                let cur = this.$data.guide;
+                if(cur == 0){
+                    let choose = document.getElementsByClassName('choose')[0];
+                    choose.classList.remove('highlight');
+                    this.$data.guide = 1;
+                    this.nextStep();
+                }else if(cur == 1){
+                    let play = document.getElementsByClassName('play')[0];
+                    play.classList.add('highlight');
+                    this.$data.guide = 2;
+                }else if(cur == 2){
+                    let play = document.getElementsByClassName('play')[0];
+                    play.classList.remove('highlight');
+                    this.$data.guide = 3;
+                    this.nextStep();
+                }else if(cur == 3){
+                    let res = document.getElementsByClassName('res')[0];
+                    res.classList.add('highlight');
+                    this.$data.guide = 4;
+                }else if(cur == 4){
+                    let res = document.getElementsByClassName('res')[0];
+                    res.classList.remove('highlight');
+                    let mask = document.getElementById('mask');
+                    mask.style.visibility = "hidden";
+                    this.$data.guide = 5;
+                }
             }
         }
 
@@ -252,6 +313,8 @@
 </script>
 
 <style scoped>
+@import '../css/ocr.css';
+
 .main-container{
   left: 0;
   margin: 50px 0 0 0;
@@ -263,18 +326,18 @@
 }
 .main-container-el{
   opacity: 0.1;
-  transition: opacity 2s;
+  transition: opacity 0.5s;
 }
 .question{
   margin-top: 20px;
   margin-left: 50px;
   font-size: 18px;
-  width: 90%;
   min-width: 400px;
   background-color: white;
   position: relative;
 }
 .exec,.res{
+  position: relative;
   margin-top: 30px;
   font-size: 18px;
   min-width: 400px;
@@ -284,12 +347,12 @@
 }
 .exec{
   margin-left: 90px;
-  width: 40%;
+  width: 38%;
 }
 .middle-img{
    position: relative;
    display: inline-block;
-   margin-left: 30px;
+   margin-left: 40px;
    margin-top: 30px;
    height: 500px;
 }
@@ -297,9 +360,11 @@
   position: absolute;
   top: 50%;
   transform: translate(-50%,-50%);
+  width: 35px;
+  height: 35px;
 }
 .res{
-  margin-left: 30px;
+  margin-left: 40px;
   width: 45%;
 }
 .breadcrumb{
@@ -343,16 +408,6 @@
   /*border: 1.3px solid black;*/
   border-radius: 6px;
   padding: 8px 12px;
-}
-#mask {
-  position: absolute;   /* 使用绝对定位或固定定位  */
-  left: 0;
-  top: 0;
-  width:100%;
-  height:100%;
-  text-align: center;
-  z-index: 99;
-  background-color: rgba(0,0,0,0.4);
 }
 .upload-demo{
   position: absolute;

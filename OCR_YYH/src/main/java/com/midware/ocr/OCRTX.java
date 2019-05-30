@@ -86,7 +86,7 @@ public class OCRTX {
         } catch (AbstractImageException e) {
             e.printStackTrace();
         }
-        System.out.println("ocrGeneral:" + ret);
+        //System.out.println("ocrGeneral:" + ret);
 
         Object jsonObject = JSONObject.stringToValue(ret);
         return jsonObject;

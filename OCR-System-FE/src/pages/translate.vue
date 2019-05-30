@@ -37,13 +37,11 @@
 
 <script>
     import TopMenu from "../components/top-menu";
-    import SideBar from "../components/side-bar";
     import {MD5} from "../util/md5"
     export default {
         name: "ocr",
         components: {
-            TopMenu,
-            SideBar
+            TopMenu
         },mounted(){
             function addStyle(element,key,value,time){
                 return new Promise(resolve => {

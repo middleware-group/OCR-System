@@ -52,19 +52,19 @@
                         name:"谭源杰",
                         sex:"男",
                         email:"24320162202906",
-                        job:"网站系统搭建，前端架构及编码，后台架构及编码"
+                        job:"系统前端架构及编码"
                     },
                     {
                         name:"梁佳音",
                         sex:"女",
                         email:"24320162202863",
-                        job:""
+                        job:"图像预处理及OCR识别"
                     },
                     {
                         name:"杨雨涵",
                         sex:"男",
-                        email:"24320162202961",
-                        job:""
+                        email:"24320162202943",
+                        job:"系统后端架构及OCR识别"
                     }
                 ],
                 organization:[
@@ -100,14 +100,15 @@
   overflow: hidden;
 }
 .member-container{
-  width: 90%;
-  margin: 130px auto 0 auto;
+  width: 100%;
+  margin: 300px auto 0 50px;
 }
 .member-card{
   text-align: center;
 }
 .member-text{
-  margin-left: 35px;
+  font-size: 17px;
+  margin-left: 20px;
   width: fit-content;
   text-align: left;
 }
@@ -122,8 +123,8 @@
 }
 .card{
   display: inline-block;
-  width: 450px;
-  padding: 0 50px 0 0;
+  width: 400px;
+  padding: 0 40px 0 0;
   margin: 0 50px 50px 0;
   opacity: 0.1;
   transition: opacity 2.5s;
