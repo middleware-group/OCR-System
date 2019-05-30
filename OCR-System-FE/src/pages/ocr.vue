@@ -24,6 +24,26 @@
              @next="nextStep"
              v-show="guide==0"></tip>
 
+        <div class="choose">
+          <div class="breadcrumb">
+            <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
+              <el-breadcrumb-item></el-breadcrumb-item>
+              <el-breadcrumb-item>所用精度</el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
+          <div class="question">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            请选择精度：
+            <el-radio v-model="precision" label="1" border style="margin-right: 0">一般精度</el-radio>
+            <el-radio v-model="precision" label="2" border>高精度</el-radio>
+          </div>
+        </div>
+
+        <tip style="display: inline-block"
+             content="这里可以选择识别的精度"
+             @next="nextStep"
+             v-show="guide==2"></tip>
+
         <div class="breadcrumb">
           <el-breadcrumb separator-class="el-icon-arrow-right" style="font-size: 18px">
             <el-breadcrumb-item></el-breadcrumb-item>
@@ -34,7 +54,7 @@
           <div class="exec" v-loading="isLoading">
             <div class="play" v-show="!isPlay">
               <el-upload
-                      v-show="radio==1"
+                      v-show="radio==1&&precision==1"
                       class="upload-demo"
                       :limit="fileNum"
                       drag
@@ -49,7 +69,7 @@
                 <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
               </el-upload>
               <el-upload
-                      v-show="radio==2"
+                      v-show="radio==2&&precision==1"
                       class="upload-demo"
                       :limit="fileNum"
                       drag
@@ -63,10 +83,25 @@
                 <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                 <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
               </el-upload>
+              <el-upload
+                      v-show="precision==2"
+                      class="upload-demo"
+                      :limit="fileNum"
+                      drag
+                      :file-list="fileList"
+                      :action="uploadActionHighPrecision"
+                      :on-error="uploadError"
+                      :on-success="uploadSucceed"
+                      :before-upload="beforeUpload"
+                      multiple>
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div class="el-upload__tip" slot="tip">只能上传 JPG/PNG 文件，且不超过 500KB</div>
+              </el-upload>
             </div>
             <tip style="position: absolute;top:0;left: 100%"
                  content="在这里上传需要识别的图片"
-                 v-show="guide==2"
+                 v-show="guide==4"
                  @next="nextStep"></tip>
 
             <div class="result" v-show="isPlay">
@@ -94,7 +129,7 @@
                  content="这里会显示识别的结果"
                  button-text="开始识别"
                  type="primary"
-                 v-show="guide==4"
+                 v-show="guide==6"
                  @next="nextStep"></tip>
             <div class="play" v-show="!isPlay">
 
@@ -160,14 +195,16 @@
         data(){
             return{
                 active: 0,
-                uploadAction: this.$axios.defaults.baseURL + "ocr",
+                uploadAction: this.$axios.defaults.baseURL + "basicOcr",
                 uploadActionTx: this.$axios.defaults.baseURL + "ocrtx",
+                uploadActionHighPrecision: this.$axios.defaults.baseURL + "accurateOcr",
                 uploadImg: "",
                 uploadImgBaidu: "",
                 uploadImgTx: "",
                 isPlay: false,
                 isLoading: false,
                 radio: "1",
+                precision: "1",
                 fileNum: 1,
                 fileList: [],
                 resultText: "",
@@ -194,8 +231,7 @@
             //上传成功
             uploadSucceed: function(response){
                 let _this = this;
-                console.log(response);
-                if(_this.$data.radio == "1"){
+                if(_this.$data.radio == "1"||_this.$data.precision=="2"){
                     if(!_this.uploadBaidu(response)){
                         return false;
                     }
@@ -287,24 +323,33 @@
                     this.$data.guide = 1;
                     this.nextStep();
                 }else if(cur == 1){
-                    let play = document.getElementsByClassName('play')[0];
-                    play.classList.add('highlight');
+                    let choose = document.getElementsByClassName('choose')[1];
+                    choose.classList.add('highlight');
                     this.$data.guide = 2;
                 }else if(cur == 2){
-                    let play = document.getElementsByClassName('play')[0];
-                    play.classList.remove('highlight');
+                    let choose = document.getElementsByClassName('choose')[1];
+                    choose.classList.remove('highlight');
                     this.$data.guide = 3;
                     this.nextStep();
                 }else if(cur == 3){
-                    let res = document.getElementsByClassName('res')[0];
-                    res.classList.add('highlight');
+                    let play = document.getElementsByClassName('play')[0];
+                    play.classList.add('highlight');
                     this.$data.guide = 4;
                 }else if(cur == 4){
+                    let play = document.getElementsByClassName('play')[0];
+                    play.classList.remove('highlight');
+                    this.$data.guide = 5;
+                    this.nextStep();
+                }else if(cur == 5){
+                    let res = document.getElementsByClassName('res')[0];
+                    res.classList.add('highlight');
+                    this.$data.guide = 6;
+                }else if(cur == 6){
                     let res = document.getElementsByClassName('res')[0];
                     res.classList.remove('highlight');
                     let mask = document.getElementById('mask');
                     mask.style.visibility = "hidden";
-                    this.$data.guide = 5;
+                    this.$data.guide = 7;
                 }
             }
         }
