@@ -78,7 +78,7 @@ public class OCRTX {
      */
     private static Object ocrGeneral(ImageClient imageClient, String bucketName, File file) {
         String ret = null;
-        System.out.println("====================================================");
+        //System.out.println("====================================================");
         //images_test2  assets
         GeneralOcrRequest request = new GeneralOcrRequest(bucketName, file);
         try {
